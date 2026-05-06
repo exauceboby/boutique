@@ -67,7 +67,6 @@ Route::prefix('admin')->as('backend.admin.')->middleware(['admin'])->group(funct
     Route::resource('purchase', PurchaseController::class);
     Route::resource('suppliers', SupplierController::class);
     Route::resource('customers', CustomerController::class);
-    Route::resource('products', ProductController::class);
     Route::resource('units', UnitController::class);
     Route::resource('currencies', CurrencyController::class);
     Route::match(['get', 'post'], 'import/products', [ProductController::class,'import'])->name('products.import');
@@ -150,14 +149,16 @@ Route::prefix('admin')->as('backend.admin.')->middleware(['admin'])->group(funct
 
 // ====================== /BACKEND ======================
 
-Route::get('clear-all', function () {
-    Artisan::call('optimize:clear');
-    return redirect()->back();
-});
+Route::middleware(['admin'])->group(function () {
+    Route::get('clear-all', function () {
+        Artisan::call('optimize:clear');
+        return redirect()->back();
+    })->name('maintenance.clear-all');
 
-Route::get('storage-link', function () {
-    Artisan::call('storage:link');
-    return redirect()->back();
+    Route::get('storage-link', function () {
+        Artisan::call('storage:link');
+        return redirect()->back();
+    })->name('maintenance.storage-link');
 });
 
 Route::get('test', [TestController::class, 'test'])->name('test');
